@@ -7,8 +7,9 @@
 </template>
 
 <script setup>
-const { init } = useAuth()
+const authStore = useAuthStore()
+
 onMounted(() => {
-  init()
+  authStore.init()
 })
 </script>

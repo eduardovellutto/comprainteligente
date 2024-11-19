@@ -14,15 +14,16 @@ import {
 
 export const useShoppingLists = () => {
   const { $db } = useNuxtApp()
-  const { user } = useAuth()
+  const authStore = useAuthStore()
 
   const createList = async (name: string) => {
-    if (!user.value) throw new Error('User not authenticated')
+    if (!authStore.user) throw new Error('User not authenticated')
     
     try {
       const listRef = await addDoc(collection($db, 'shoppingLists'), {
         name,
-        userId: user.value.uid,
+        userId: authStore.user.uid,
+        userEmail: authStore.user.email,
         items: [],
         createdAt: serverTimestamp(),
         totalAmount: 0,
@@ -41,7 +42,7 @@ export const useShoppingLists = () => {
     purchased?: boolean
     unitPrice?: number
   }) => {
-    if (!user.value) throw new Error('User not authenticated')
+    if (!authStore.user) throw new Error('User not authenticated')
 
     try {
       const listRef = doc($db, 'shoppingLists', listId)
@@ -68,7 +69,7 @@ export const useShoppingLists = () => {
       quantity?: number
     }
   ) => {
-    if (!user.value) throw new Error('User not authenticated')
+    if (!authStore.user) throw new Error('User not authenticated')
 
     try {
       const listRef = doc($db, 'shoppingLists', listId)
@@ -90,16 +91,16 @@ export const useShoppingLists = () => {
   }
 
   const getUserLists = async () => {
-    if (!user.value) throw new Error('User not authenticated')
+    if (!authStore.user) throw new Error('User not authenticated')
 
     try {
       const q = query(
         collection($db, 'shoppingLists'),
-        where('userId', '==', user.value.uid)
+        where('userId', '==', authStore.user.uid)
       )
       const sharedQ = query(
         collection($db, 'shoppingLists'),
-        where('sharedWith', 'array-contains', user.value.email)
+        where('sharedWith', 'array-contains', authStore.user.email)
       )
 
       const [ownedLists, sharedLists] = await Promise.all([
@@ -128,7 +129,7 @@ export const useShoppingLists = () => {
   }
 
   const calculateTotal = async (listId: string) => {
-    if (!user.value) throw new Error('User not authenticated')
+    if (!authStore.user) throw new Error('User not authenticated')
 
     try {
       const listRef = doc($db, 'shoppingLists', listId)
@@ -152,13 +153,13 @@ export const useShoppingLists = () => {
   }
 
   const deleteList = async (listId: string) => {
-    if (!user.value) throw new Error('User not authenticated')
+    if (!authStore.user) throw new Error('User not authenticated')
 
     try {
       const listRef = doc($db, 'shoppingLists', listId)
       const listDoc = await getDoc(listRef)
       
-      if (listDoc.data()?.userId !== user.value.uid) {
+      if (listDoc.data()?.userId !== authStore.user.uid) {
         throw new Error('Not authorized to delete this list')
       }
 

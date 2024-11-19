@@ -1,0 +1,30 @@
+preciso de uma aplicação saas que será um gerador de listas de compras, o usuário após o login poderá criar uma lista de compras fornecendo o produto e a quantidade desejada, após o preenchimento do formulário poderá salvar a lista podemos utilziar o firebase para esse processo, dessa forma podemos armazenar tanto os logins e as listas de cada usuário para que ele possa acessálas após o login. O usuário poderá selecionar a lista que deseja abrir, ao abrir a lista deveremos mostras os itens incluidos anteriomente nessa lista, com um checkbox para dizer que ja comprou o item e um campo para preenchimento do valor unitário do produto. Ao final deveremos ter um botão que irá calcular o valor total da compra mostrar em tela ao usuóario e salvar essa compra no banco de dados para posteriormente gerar dashboard com evolução dos gastos, produtos mais comprados, etc... Também podemos deixar preparado para integração com uma IA que poderá analisar as listas antigas e sugerir uma lista de compras baseado nos produtos comprados anteriormente e o periodo de uma compra e outra, gostaria que isso fosse feito em Nuxt3 para utilizamos como uma PWA também
+
+
+
+identificador firebase
+comprainteligente-93d48
+
+
+
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyAroXwSm-kpZ0RWFvykLD25kBiWD14gpfQ",
+  authDomain: "comprainteligente-93d48.firebaseapp.com",
+  projectId: "comprainteligente-93d48",
+  storageBucket: "comprainteligente-93d48.firebasestorage.app",
+  messagingSenderId: "946364048388",
+  appId: "1:946364048388:web:d72971d0f053b54a878151",
+  measurementId: "G-CKGS47DCV1"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
