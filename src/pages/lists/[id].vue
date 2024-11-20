@@ -8,14 +8,14 @@
           @click="showAddItemModal = true"
           class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
         >
-          Add Item
+          Adicionar Item
         </button>
         <button
           v-if="!list.completed"
           @click="showSuggestionsModal = true"
-          class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700"
+          class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-orange-600 hover:bg-orange-700"
         >
-          AI Suggestions
+          Sugestão IA
         </button>
         <button
           v-if="list.isOwner"
@@ -71,29 +71,29 @@
     <!-- Total and Complete Button -->
     <div v-if="!list.completed" class="flex justify-between items-center bg-gray-50 p-4 rounded-lg">
       <div class="text-lg font-medium text-gray-900">
-        Current Total: {{ formatCurrency(calculateCurrentTotal()) }}
+        Total: {{ formatCurrency(calculateCurrentTotal()) }}
       </div>
       <button
         @click="completeList"
         class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700"
       >
-        Complete Shopping
+        Finalizar Compra
       </button>
     </div>
 
     <div v-else class="bg-green-50 p-4 rounded-lg">
       <div class="text-lg font-medium text-green-900">
-        Final Total: {{ formatCurrency(list.totalAmount) }}
+        Total: {{ formatCurrency(list.totalAmount) }}
       </div>
       <div class="text-sm text-green-700">
-        Completed on {{ formatDate(list.completedAt) }}
+        Finalizada em {{ formatDate(list.completedAt) }}
       </div>
     </div>
 
     <!-- Add Item Modal -->
     <div v-if="showAddItemModal" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center">
       <div class="bg-white rounded-lg p-6 max-w-md w-full">
-        <h3 class="text-lg font-medium text-gray-900 mb-4">Add New Item</h3>
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Adicionar</h3>
         
         <div class="mb-4">
           <button
@@ -136,13 +136,13 @@
               @click="closeAddItemModal"
               class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-500"
             >
-              Cancel
+              Cancelar
             </button>
             <button
               type="submit"
               class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
             >
-              Add Item
+              Adicionar
             </button>
           </div>
         </form>
@@ -203,7 +203,7 @@
                 @click="addSuggestedItem(suggestion)"
                 class="text-sm text-indigo-600 hover:text-indigo-500"
               >
-                Add to List
+                Adicionar Item
               </button>
             </li>
           </ul>
@@ -212,7 +212,7 @@
               @click="showSuggestionsModal = false"
               class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-500"
             >
-              Close
+              Fechar
             </button>
           </div>
         </div>
@@ -223,9 +223,11 @@
 
 <script setup>
 import { format } from 'date-fns'
-import { useAI } from '~/composables/useAI'
+import { ptBR } from 'date-fns/locale';
+// import { useAI } from '~/composables/useAI'
 import { useSharing } from '~/composables/useSharing'
 import { useNotifications } from '~/composables/useNotifications'
+import { doc, onSnapshot, arrayUnion, updateDoc, Timestamp } from 'firebase/firestore'
 
 const route = useRoute()
 const { $db } = useNuxtApp()
@@ -245,7 +247,7 @@ const newItem = ref({
 })
 
 const { shareList } = useSharing()
-const { generateShoppingListSuggestion } = useAI()
+// const { generateShoppingListSuggestion } = useAI()
 const { requestPermission, setupMessageListener } = useNotifications()
 const { addItemToList, updateItemInList, calculateTotal } = useShoppingLists()
 
@@ -256,18 +258,28 @@ onMounted(async () => {
 })
 
 const loadList = async () => {
-  const docRef = doc($db, 'shoppingLists', route.params.id)
-  const unsubscribe = onSnapshot(docRef, (doc) => {
-    if (doc.exists()) {
-      list.value = {
-        id: doc.id,
-        ...doc.data(),
-        isOwner: doc.data().userId === user.value?.uid
+  try {
+    const docRef = doc($db, 'shoppingLists', route.params.id)
+    const unsubscribe = onSnapshot(docRef, (doc) => {
+      if (doc.exists()) {
+        list.value = {
+          id: doc.id,
+          ...doc.data(),
+          isOwner: doc.data().userId === user.value?.uid
+        }
       }
-    }
-  })
+    })
 
-  onUnmounted(() => unsubscribe())
+  } catch (error) {
+    console.error(error)
+  }
+
+  if (unsubscribe) {
+    // Move para fora da função loadList
+    onUnmounted(() => {
+      unsubscribe()
+    })
+  }
 }
 
 const handleBarcodeScan = async (barcode) => {
@@ -285,17 +297,17 @@ const shareListWithUser = async () => {
   }
 }
 
-const getSuggestions = async () => {
-  loading.value = true
-  try {
-    const result = await generateShoppingListSuggestion(list.value)
-    suggestions.value = result.split('\n').filter(Boolean)
-  } catch (error) {
-    console.error('Error getting suggestions:', error)
-  } finally {
-    loading.value = false
-  }
-}
+// const getSuggestions = async () => {
+//   loading.value = true
+//   try {
+//     const result = await generateShoppingListSuggestion(list.value)
+//     suggestions.value = result.split('\n').filter(Boolean)
+//   } catch (error) {
+//     console.error('Error getting suggestions:', error)
+//   } finally {
+//     loading.value = false
+//   }
+// }
 
 const addSuggestedItem = (suggestion) => {
   newItem.value = {
@@ -359,14 +371,14 @@ const completeList = async () => {
 }
 
 const formatCurrency = (amount) => {
-  return new Intl.NumberFormat('en-US', {
+  return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
-    currency: 'USD'
+    currency: 'BRL'
   }).format(amount)
 }
 
 const formatDate = (timestamp) => {
   if (!timestamp) return ''
-  return format(timestamp.toDate(), 'PPP')
+  return format(timestamp.toDate(), 'PPP', { locale: ptBR });
 }
 </script>

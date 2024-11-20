@@ -1,12 +1,12 @@
 <template>
   <div>
     <div class="flex justify-between items-center mb-8">
-      <h1 class="text-2xl font-bold text-gray-900">My Shopping Lists</h1>
+      <h1 class="text-2xl font-bold text-gray-900">Minhas Listas de Compras</h1>
       <button
         @click="showNewListModal = true"
         class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
       >
-        Create New List
+        Nova Lista
       </button>
     </div>
 
@@ -22,12 +22,12 @@
             class="px-2 py-1 text-xs rounded-full"
             :class="list.completed ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'"
           >
-            {{ list.completed ? 'Completed' : 'In Progress' }}
+            {{ list.completed ? 'Finalizada' : 'Em andamento' }}
           </span>
         </div>
         
         <div class="text-sm text-gray-500 mb-4">
-          Created: {{ formatDate(list.createdAt) }}
+          Criada: {{ formatDate(list.createdAt) }}
         </div>
         
         <div class="flex justify-between items-center">
@@ -38,7 +38,7 @@
             :to="`/lists/${list.id}`"
             class="text-indigo-600 hover:text-indigo-500 text-sm font-medium"
           >
-            View List →
+            Visualizar Itens →
           </NuxtLink>
         </div>
       </div>
@@ -62,13 +62,13 @@
               @click="showNewListModal = false"
               class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-500"
             >
-              Cancel
+              Cancelar
             </button>
             <button
               type="submit"
               class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
             >
-              Create
+              Criar
             </button>
           </div>
         </form>
@@ -98,7 +98,7 @@ onMounted(async () => {
 
 const formatDate = (timestamp) => {
   if (!timestamp) return 'N/A'
-  return format(timestamp.toDate(), 'MMM dd, yyyy')
+  return format(timestamp.toDate(), 'dd/MMM/yyyy')
 }
 
 const createNewList = async () => {

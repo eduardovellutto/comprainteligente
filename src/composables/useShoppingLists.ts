@@ -1,16 +1,4 @@
-import { 
-  collection,
-  addDoc,
-  updateDoc,
-  deleteDoc,
-  doc,
-  query,
-  where,
-  getDocs,
-  getDoc,
-  serverTimestamp,
-  arrayUnion
-} from 'firebase/firestore'
+import { doc, arrayUnion, updateDoc,addDoc, serverTimestamp, collection, Timestamp, getDoc, query, where, getDocs, deleteDoc } from 'firebase/firestore'
 
 export const useShoppingLists = () => {
   const { $db } = useNuxtApp()
@@ -52,7 +40,7 @@ export const useShoppingLists = () => {
           id: crypto.randomUUID(),
           purchased: false,
           unitPrice: 0,
-          addedAt: serverTimestamp()
+          addedAt: Timestamp.now()
         })
       })
     } catch (error: any) {
@@ -83,7 +71,7 @@ export const useShoppingLists = () => {
       
       await updateDoc(listRef, { 
         items,
-        lastUpdated: serverTimestamp()
+        lastUpdated: Timestamp.now()
       })
     } catch (error: any) {
       throw new Error(error.message)
@@ -120,7 +108,7 @@ export const useShoppingLists = () => {
         isOwner: false
       }))
 
-      return [...owned, ...shared].sort((a, b) => 
+      return [...owned, ...shared].sort((a:any, b:any) => 
         b.createdAt?.toMillis() - a.createdAt?.toMillis()
       )
     } catch (error: any) {

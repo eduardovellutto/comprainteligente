@@ -19,7 +19,7 @@ export const useNotifications = () => {
 
   const setupMessageListener = () => {
     const messaging = getMessaging($firebase)
-    onMessage(messaging, (payload) => {
+    onMessage(messaging, (payload:any) => {
       new Notification(payload.notification.title, {
         body: payload.notification.body
       })
