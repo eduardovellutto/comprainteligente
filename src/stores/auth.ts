@@ -1,77 +1,39 @@
 import { defineStore } from 'pinia'
-import { 
-  GoogleAuthProvider, 
-  signInWithPopup,
-  onAuthStateChanged,
-  signOut as firebaseSignOut,
-  type User
-} from 'firebase/auth'
+import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from 'firebase/auth'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    user: null as User | null,
-    loading: true,
-    error: null as string | null
+    user: null,
+    loading: false,
+    error: null
   }),
 
-  getters: {
-    isAuthenticated: (state) => !!state.user,
-    userEmail: (state) => state.user?.email
-  },
-
   actions: {
-    async init() {
-      const { $auth } = useNuxtApp()
-      
-      // Set up auth state listener
-      onAuthStateChanged($auth, (user) => {
-        this.user = user
-        this.loading = false
-      })
-    },
-
     async signInWithGoogle() {
-      const { $auth } = useNuxtApp()
-      this.error = null
+      const auth = getAuth()
+      const provider = new GoogleAuthProvider()
       
       try {
-        const provider = new GoogleAuthProvider()
-        const result = await signInWithPopup($auth, provider)
+        this.loading = true
+        const result = await signInWithPopup(auth, provider)
         this.user = result.user
         return result.user
-      } catch (error: any) {
-        console.error('Error signing in:', error)
-        this.error = this.getErrorMessage(error.code)
+      } catch (error) {
+        this.error = error.message
         throw error
+      } finally {
+        this.loading = false
       }
     },
 
-    async signOut() {
-      const { $auth } = useNuxtApp()
-      
+    async logout() {
+      const auth = getAuth()
       try {
-        await firebaseSignOut($auth)
+        await signOut(auth)
         this.user = null
-        this.error = null
-        navigateTo('/login')
-      } catch (error: any) {
-        this.error = this.getErrorMessage(error.code)
+      } catch (error) {
+        this.error = error.message
         throw error
-      }
-    },
-
-    getErrorMessage(code: string): string {
-      switch (code) {
-        case 'auth/popup-blocked':
-          return 'Pop-up was blocked by your browser. Please enable pop-ups and try again.'
-        case 'auth/cancelled-popup-request':
-          return 'Authentication cancelled. Please try again.'
-        case 'auth/network-request-failed':
-          return 'Network error. Please check your connection.'
-        case 'auth/unauthorized-domain':
-          return 'This domain is not authorized for Google sign-in. Please contact support.'
-        default:
-          return 'An error occurred. Please try again.'
       }
     }
   }
