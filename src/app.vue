@@ -3,7 +3,7 @@
     <header class="bg-red-600 shadow-md sticky top-0 z-50">
       <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div class="flex justify-between items-center">
-          <h1 class="text-lg sm:text-xl font-bold text-white">SMART SHOPPING</h1>
+          <h1 class="text-lg sm:text-xl font-bold text-white">Lista de Compras</h1>
           <div v-if="authStore.user" class="flex items-center space-x-4">
             <span class="text-white text-sm hidden sm:inline">{{ authStore.user.email }}</span>
             <button @click="authStore.logout" class="text-sm text-white hover:text-gray-200 transition">
